@@ -1,0 +1,314 @@
+"""
+A Position represents an x, y coordinate in a given warehouse. Position
+can be used to determine how far apart or near together two vehicles are.
+"""
+
+import math
+
+class Position(object):
+
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def get_x(self):
+        return self.x
+
+    def get_y(self):
+        return self.y
+
+    def __str__(self):
+        return "({},{})".format(self.x,self.y)
+
+    def __eq__(self, other):
+        if not isinstance(other, Position):
+            return False
+
+        return (self.x == other.get_x() and self.y == other.get_y())
+
+
+def get_distance(position_1, position_2):
+    """
+    Determines the distance between two Positions
+    Distance is calculated as the Euclidean distance in two dimensions
+    https://en.wikipedia.org/wiki/Euclidean_distance
+    """
+    x_diff = abs(position_1.get_x() - position_2.get_x())
+    y_diff = abs(position_1.get_y() - position_2.get_y())
+    return math.sqrt(pow(x_diff, 2) + pow(y_diff, 2))
+
+
+#PING-->
+"""A Ping represents a vehicle's position at a given timestamp."""
+
+class Ping(object):
+
+    def __init__(self, x, y, timestamp):
+        self.position = Position(x, y)
+        # Timestamp of the ping, in seconds since the epoch.
+        self.timestamp = timestamp
+
+    def get_position(self):
+        return self.position
+
+    def get_timestamp(self):
+        # timestamp in seconds since a fixed (but arbitrary) epoch.
+        return self.timestamp
+
+    def __str__(self):
+        return "{},{}".format(self.position,self.timestamp)
+
+    def __eq__(self, other):
+        if not isinstance(other, Ping):
+            return False
+
+        return (self.position == other.get_position() and self.timestamp== other.get_timestamp())
+
+def seconds_between(ping1, ping2):
+    """
+    Determines the number of seconds between two given Pings. The result is
+    positive if ping1 is earlier than ping2.
+    """
+    return ping2.get_timestamp() - ping1.get_timestamp()
+
+
+
+class Vehicle(object):
+
+    def __init__(self, name):
+        self.name = name
+        self.pings = []
+
+    def __str__(self):
+        return "{},{}".format(self.name,self.pings)
+
+    def get_name(self):
+        """
+        The name of the vehicle.
+        """
+        return self.name
+
+    def get_pings(self):
+        """
+        The pings for the vehicle, in chronological order (earliest first).
+        """
+        pings=self.pings
+        return pings
+
+    def add_pings(self,ping):
+        self.pings.append(ping)
+
+    def __getitem__(self, x):
+         return self.pings[x]
+
+    def get_total_distance(self):
+        positions = []
+        distance = 0
+        for ping in self.pings:
+            positions.append(ping.get_position())
+        for i in range(1,len(positions)):
+            distance += get_distance(positions[i-1],positions[i])
+        return distance
+
+    def get_average_speed(self):
+        distance= self.get_total_distance()
+        sum_time=0
+        pings= self.get_pings()
+        for i in range(1,len(pings)):
+            sum_time+=seconds_between(pings[i-1],pings[i])
+
+        if sum_time!=0:
+            avg_speed= (distance/sum_time)
+        else:
+            avg_speed="Lapse time is 0 between pings"
+
+        return avg_speed
+
+
+class WarehouseServer(object):
+
+
+    def __init__(self):
+        # vehicles is a list of vehicle instances
+        self.vehicles = []
+
+    def get_average_speeds(self):
+        """
+        Returns a dictionary from vehicle name to that vehicle's average speed
+        for all vehicles.
+        """
+        avg_speeds = {}
+        for vehicle in self.vehicles:
+            avg_speeds[vehicle.get_name()] = vehicle.get_average_speed()
+        return avg_speeds
+
+    def add_vehicles(self, vehicle):
+        self.vehicles.append(vehicle)
+
+    def __getitem__(self, x):
+        return self.vehicles[x]
+
+    def __str__(self):
+        return "Los vehiculos correspondientes{}".format(self.vehicles)
+
+
+    def get_most_traveled_since(self, max_results, timestamp):
+        """
+        Returns a sorted list of size max_results of vehicle names
+        corresponding to the vehicles that have traveled the most distance since
+        the given timestamp.
+        """
+        most_traveled_since=[]
+        distances=[]
+        #since a given timestamp, check how many distance has each car done:
+        vehicles_since_time_duration = {}
+        #get a list of each car from the Warehouse:
+        vehicles=self.vehicles
+        for vehicle in vehicles:
+            vehicle.get_pings()
+            pings=[]
+            for ping in vehicle.get_pings() :
+                # get the pings between the timestamps:
+                if timestamp >= ping.get_timestamp():
+                    pings.append(ping)
+            for i in pings:
+                #remove each ping that is before the timestamp.
+                vehicle.get_pings().remove(i)
+            # now I do a dict with pairs of {distance since timestamp:vehicle name}
+            vehicles_since_time_duration[vehicle.get_name()] = vehicle.get_total_distance()
+        print(vehicles_since_time_duration)
+        vehicles_since_time_duration_sorted=sorted(vehicles_since_time_duration.items(),key=lambda x:x[1],reverse=True)
+        print(vehicles_since_time_duration_sorted)
+        for i in range(max_results):
+            most_traveled_since.append(vehicles_since_time_duration_sorted[i][0])
+
+        return most_traveled_since
+
+    def check_for_damage(self):
+
+        """
+        Returns a list of names identifying vehicles that might have been damaged
+        through any number of risky behaviors, including collision with another
+        vehicle and excessive acceleration.
+        forklifts which have been driven aggressively (quick acceleration and
+    deceleration) or when forklifts collide with one another. You can use any
+    heuristics you like, but are encouraged to make sure your decisions are well
+    documented and your code is appropriately decomposed.
+        """
+
+        #TO DO
+        #check aceleration: we can get the avg speed of a forklift:
+        #instantainly get the speed variation of each forklift. we need the speed of the forklift in each point.
+        #speed, timestamp.
+        #we can supose that in the first point, speed=0. next point we have a speed of v=x/t and so on.
+        #we check each speed vs avg speed. if there is a big variation we will have big variations of
+
+        #First: get all pings for a vehicle, and each velocity for each ping:
+
+        #Second: get the avg speed of the vehicle
+
+
+        #thirD: compare avg_speed with each speed. if the speed is 25% bigger than normal, append vehicle to check damage list.
+
+
+        #CHECK COLISION:
+        #for each vehicle check if they have the same ping:
+        vehicle_pings={}
+        #make a dict with dict[vehicle_name]=[list of pings of vehicle]
+        for vehicle in self.vehicles:
+                vehicle_pings[vehicle.get_name()]=vehicle.get_pings()
+        #compare the lists and check if they have the same ping
+        all_pings=[]
+        repeted=[]
+        for key,values in vehicle_pings.items():
+            for i in values:all_pings.append(i)
+        for i in range(1,len(all_pings)):
+            if all_pings[i-1]==all_pings[i]:
+                repeted.append(all_pings[i])
+        print(repeted)
+        #print(vehicle_pings)
+
+            #print(count)
+
+       #check if are from diferent vehicles:
+        return []
+
+    def initialize_server(self, file_name):
+        with open(file_name, 'r') as csvfile:
+            reader = csv.reader(csvfile, delimiter=',')
+            for parsed_line in reader:
+                self.process_ping(
+                            parsed_line[0],
+                            float(parsed_line[1]),
+                            float(parsed_line[2]),
+                            int(parsed_line[3]))
+
+    def process_ping(self, vehicle_name, x, y, timestamp):
+        ping = Ping(x, y, timestamp)
+        if len(self.vehicles) == 0 or vehicle_name != self.vehicles[-1].get_name():
+            self.vehicles.append(Vehicle(vehicle_name))
+        self.vehicles[-1].get_pings().append(ping)
+
+
+
+
+#Test
+
+point1=Position(0,0)
+point2=Position(0,1)
+point3=Position(0,2)
+point4=Position(3,7)
+
+
+
+ping1= Ping(10,0,10)
+ping2= Ping(10,0,10)
+
+ping3= Ping(30,2,33)
+ping4= Ping(40,3,44)
+
+ping5= Ping(50,4,55)
+ping6= Ping(60,5,66)
+ping7= Ping(70,6,77)
+ping8= Ping(80,7,88)
+
+ping9=Ping(110,8,99)
+ping10=Ping(150,9,101)
+ping11=Ping(180,10,111)
+ping12=Ping(202,11,122)
+
+
+
+
+vehicleA= Vehicle("A")
+vehicleB= Vehicle("B")
+vehicleC=Vehicle("C")
+#A
+vehicleA.add_pings(ping1)
+vehicleA.add_pings(ping2)
+vehicleA.add_pings(ping3)
+vehicleA.add_pings(ping4)
+#B
+vehicleB.add_pings(ping5)
+vehicleB.add_pings(ping6)
+vehicleB.add_pings(ping7)
+vehicleB.add_pings(ping8)
+#C
+vehicleC.add_pings(ping9)
+vehicleC.add_pings(ping10)
+vehicleC.add_pings(ping11)
+vehicleC.add_pings(ping12)
+
+#TeST
+
+warehouse1=WarehouseServer()
+
+warehouse1.add_vehicles(vehicleA)
+warehouse1.add_vehicles(vehicleB)
+warehouse1.add_vehicles(vehicleC)
+
+
+#print(warehouse1.vehicles)
+#print(warehouse1.get_most_traveled_since(2,5))
+#print(warehouse1.get_average_speeds())
+print(warehouse1.check_for_damage())

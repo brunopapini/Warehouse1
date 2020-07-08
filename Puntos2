@@ -1,0 +1,147 @@
+, punto, math.sqrt((dif_x_2+dif_y_2))))
+
+3) en este caso:
+print( A.distancia(B))
+si utilizo print en la funcion en vez de return al ejeccutar el codigo por consola me devuelve 
+el valor deseado pero tambien un no.
+Al utilizar return esto se resuelve.
+
+print(A.cuadrante()) --> con el metodo def cuadrante: if x>0 y y<0 : print("Cuadrante 1")
+Cuadrante 1
+None
+
+""lo que pasa aca es que el el return esta vacio, entonces el metodo devuelve un NONE , por mas que este dentreo del print.
+
+Para resolver esto:
+print(A.cuadrante())--> con el metodo def cuadrante: if x>0 y y<0 : return("cuadrante1)
+aca me devuelve:
+Cuadrante 1
+
+
+4) si luego utilizo otra clase, por ejemplo Rectangulo , que esta linkeada con Punto, y que dos puntos
+forman la diagonal del rectangulo, es necesario instanciar en cada uno de los parametros que le voy a pasar
+al crear el objeto rectangulo, en este caso final e inicial, las instancias de la clase punto
+
+un punto se instancia punto= Punto(A,B)
+para la clase rectangulo tengo que hacer:
+class Rectangulo:
+    def __init__(self, inicial= PUNTO(), final= PUNTO()
+
+
+5) si necesito utilizar una variable que solo esta en el metodo, no me la va a reconocer en otro metodo, por 
+eso es necesario definirlas en el constructor de la clase:
+class Rectangulo:
+    def __init__(self,inicial=Punto(),final=Punto()):
+        self.inicial=inicial
+        self.final=final
+        self.vbase= abs(self.final.x-self.inicial.x) # ecomo pasa aqui, si esto estuviera dentro del metodo de 
+                                                     #base, no podriamos utilizarla luego dentro de area.           
+        
+        
+        self.valtura= abs(self.final.y-self.inicial.y)
+        self.varea = abs(self.vbase * self.valtura)
+                                            
+
+    def base(self):
+        return ("La base del rectangulo es {}".format(self.vbase))
+    def altura(self):
+        return ("La altura del rectangulo es {}".format(self.valtura))
+    def area(self):
+        return ("El area del rectangulo es {}".format(self.varea))
+
+
+6)Por ultimo es importante definir as variables distintas al metodo, para que no se sobreescriban.:
+    def base(self)---> metodo
+        vbase -->variable
+
+"""
+
+class Punto:
+
+    def __init__(self, x=0, y=0):
+        self.x= x
+        self.y= y
+
+    def __str__(self):
+        return "({},{})".format(self.x,self.y)
+
+    """
+    Añade un método llamado cuadrante que indique
+    a qué cuadrante pertenece el punto,teniendo en cuenta que si X == 0 e Y != 0 se sitúa sobre el eje Y, si X != 0 e Y == 0 se sitúa sobre el eje X y si X == 0 e Y == 0
+    está sobre el origen."""
+
+
+    def cuadrante(self):
+        if self.x>0 and self.y >0:
+           return ("Cuadrante 1")
+        elif self.x<0 and self.y>0:
+           return ("Cuadrante 2")
+        elif self.x<0 and self.y<0:
+           return ("Cuadrante 3")
+        elif self.x>0 and self.y<0:
+           return ("Cuadrante 4")
+        elif self.x==0 and self.y!=0:
+           return ("Eje y")
+        elif self.x!=0 and self.y==0:
+           return ("Eje x")
+        else:
+           return ("Centro de coordenadas")
+
+    """
+    Añade un método llamado vector, que tome otro punto y calcule el vector resultante entre los dos puntos."""
+    def vector(self, punto):
+        dif_x= punto.x-self.x
+        dif_y= punto.y-self.y
+        return ("El vector entre {} y {} es vector: ({},{})".format(self, punto, dif_x,dif_y))
+
+
+        """(Optativo) Añade un método llamado distancia, que tome otro punto y calcule la distancia entre los dos puntos y la muestre por pantalla. La fórmula es la siguiente:"""
+
+    def distancia(self, punto):
+        dif_x_2 = (self.x - punto.x)**2
+        dif_y_2 = (self.y - punto.y)**2
+        return ("La distancia entre {} y {} es {}".format(self, punto, math.sqrt((dif_x_2+dif_y_2))))
+
+A = Punto(2,3)
+B = Punto(5,5)
+C = Punto(-3, -1)
+D = Punto(0,0)
+
+
+#Ahora definimos una clase Rectangulo:
+class Rectangulo:
+    def __init__(self,inicial=Punto(),final=Punto()):
+        self.inicial=inicial
+        self.final=final
+        self.vbase= abs(self.final.x-self.inicial.x)
+        self.valtura= abs(self.final.y-self.inicial.y)
+        self.varea = abs(self.vbase * self.valtura)
+
+
+    def base(self):
+        return ("La base del rectangulo es {}".format(self.vbase))
+    def altura(self):
+        return ("La altura del rectangulo es {}".format(self.valtura))
+    def area(self):
+        return ("El area del rectangulo es {}".format(self.varea))
+
+R = Rectangulo(A, B)
+print("",
+A.cuadrante(),"\n",
+C.cuadrante(),"\n",
+D.cuadrante(),"\n",
+
+A.vector(B),"\n",
+B.vector(A),"\n",
+
+A.distancia(B),"\n",
+B.distancia(A),"\n",
+
+A.distancia(D),"\n",
+B.distancia(D),"\n",
+C.distancia(D),)
+
+R = Rectangulo(A, B)
+print("",R.base(),"\n",
+R.altura(),"\n",
+R.area())

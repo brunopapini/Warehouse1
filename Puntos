@@ -1,0 +1,87 @@
+import math
+
+class Punto:
+  def __init__(self, x=0, y=0):
+      #importante defirla como valor por defecto x=0 e y=0 , porque sino, despues cuando quiero instanciar
+      #objecto como constructor de la clase rectangulo, no me lo permite.
+    self.x=x
+    self.y=y
+
+  def __str__(self):
+    return "({},{})".format(self.x, self.y)
+
+  def cuadrante(self):
+    if self.x>0 and self.y >0:
+        print("Cuadrante 1.")
+    elif self.x<0 and self.y >0:
+        print("Cuadrante 2.")
+    elif self.x < 0 and self.y < 0:
+        print("Cuadrante 3.")
+    elif self.x>0 and self.y<0:
+        print("Cuadrante 4.")
+    elif self.x==0 and self.y!=0:
+        print("Eje Y.")
+    elif self.x!=0 and self.y==0:
+        print("Eje X.")
+    else:
+        print("Esta sobre el origen.")
+
+
+  def vector(self ,B):
+        x = B.x-self.x
+        y= B.y-self.y
+        print("AB({},{})".format(x,y))
+    
+  def distancia(self, B):
+      x = B.x - self.x
+      x2= x**2
+      y = B.y - self.y
+      y2= y**2
+      d= math.sqrt((x2+y2))
+      print("La distancia entre el punto {} y el {} es {}".format(self, B, d))
+
+
+
+class Rectangulo:
+    def __init__(self, inicial=Punto(), final=Punto()):
+        """aca si no pongo en Punto x=0, y=0 me aparece error:
+          File "Puntos", line 45, in <module>
+        class Rectangulo:
+        File "Puntos", line 47, in Rectangulo
+            def __init(self, inicial=Punto(), final=Punto()):
+            TypeError: __init__() missing 2 required positional arguments: 'x' and 'y' """
+
+        self.inicial= inicial
+        self.final=final
+        self.vbase = abs(self.final.x - self.inicial.x)
+        self.valtura = abs(self.final.y - self.inicial.y)
+        self.varea = self.vbase * self.valtura
+
+
+    def base(self):
+        #vbase = abs(self.final.x - self.inicial.x)
+        # si defino la variable en el metodo, despues no lo puedo utilizar en otro metodo
+        print ("La base del rectangulo es {}".format(self.vbase))
+    def altura(self):
+        #valtura = abs(self.final.y - self.final.y)
+        print("La altura del rectangulo es {}".format(self.valtura))
+    def area(self):
+        #varea = self.vbase * self.valtura
+        print("El area del rectangulo es {}".format(self.varea))
+
+
+#Data
+punto1=Punto(3,2)
+punto2=Punto(-3,2)
+punto3=Punto(-3,-2)
+punto4=Punto(3,-2)
+punto5=Punto(0,0)
+punto6=Punto(1,0)
+punto7= Punto(0,1)
+punto8= Punto(5,5)
+
+print(punto1.vector(punto8))
+print(punto1.distancia(punto8))
+
+rectangulo = Rectangulo(punto1, punto8)
+print(rectangulo.altura(),rectangulo.area(),rectangulo.base())
